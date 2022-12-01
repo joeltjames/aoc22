@@ -1,10 +1,5 @@
 <!-- Entries between SOLUTIONS and RESULTS tags are auto-generated -->
 
-[![AoC](https://badgen.net/badge/AoC/2022/blue)](https://adventofcode.com/2022)
-[![Node](https://badgen.net/badge/Node/v16.13.0+/blue)](https://nodejs.org/en/download/)
-![Language](https://badgen.net/badge/Language/TypeScript/blue)
-[![Template](https://badgen.net/badge/Template/aocrunner/blue)](https://github.com/caderek/aocrunner)
-
 # 🎄 Advent of Code 2022 🎄
 
 ## Solutions
@@ -41,37 +36,15 @@
 
 _Click a badge to go to the specific day._
 
----
-
-## Installation
-
-```
-yarn
-```
-
-## Running in dev mode
-
-```
-yarn start <day>
-```
-
-Example:
-
-```
-yarn start 1
-```
-
----
-
 ## Results
 
 <!--RESULTS-->
 
 ```
 Day 01
-Time part 1: 0.468ms
-Time part 2: 0.356ms
-Both parts: 0.8242499999999999ms
+Time part 1: 0.338ms
+Time part 2: 0.371ms
+Both parts: 0.705ms
 ```
 
 ```
@@ -244,7 +217,7 @@ Both parts: -
 
 ```
 Total stars: 2/50
-Total time: 0.824ms
+Total time: 0.705ms
 ```
 
 <!--/RESULTS-->
