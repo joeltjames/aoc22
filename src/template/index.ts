@@ -1,5 +1,8 @@
 import run from "aocrunner";
 
+export const sum = (arr: number[]) =>
+  arr.reduce((a: number, b: number) => a + b, 0);
+
 const parseInput = (rawInput: string) => rawInput;
 
 const part1 = (rawInput: string) => {

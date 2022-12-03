@@ -1,5 +1,5 @@
 import run from "aocrunner";
-import { execFile } from "child_process";
+import { sum } from "../utils/index.js";
 
 const parseInput = (rawInput: string) =>
   rawInput.split("\n").map((v) => v.split(" "));
@@ -34,7 +34,7 @@ const part1 = (rawInput: string) => {
     you: youMapping[you],
   }));
   const scores = input.map(calculateScore);
-  return scores.reduce((prev, curr) => prev + curr, 0);
+  return sum(scores);
 };
 
 const resultMap: any = {
@@ -64,10 +64,7 @@ const part2 = (rawInput: string) => {
     result: resultMap[result],
   }));
 
-  return input
-    .map(determineYou)
-    .map(calculateScore)
-    .reduce((prev, curr) => prev + curr, 0);
+  return sum(input.map(determineYou).map(calculateScore));
 };
 
 run({

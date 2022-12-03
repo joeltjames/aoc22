@@ -1,4 +1,5 @@
 import run from "aocrunner";
+import { sum } from "../utils/index.js";
 
 const parseInput = (rawInput: string) => {
   return rawInput
@@ -10,9 +11,9 @@ const part1 = (rawInput: string) => {
   const input = parseInput(rawInput);
   let max = 0;
   input.forEach((set) => {
-    const sum = set.reduce((partialSum, a) => partialSum + a, 0);
-    if (sum > max) {
-      max = sum;
+    const result = sum(set);
+    if (result > max) {
+      max = result;
     }
   });
   return max;
@@ -20,10 +21,8 @@ const part1 = (rawInput: string) => {
 
 const part2 = (rawInput: string) => {
   const input = parseInput(rawInput);
-  const sums = input
-    .map((set) => set.reduce((partialSum, a) => partialSum + a, 0))
-    .sort((a, b) => b - a);
-  return sums.slice(0, 3).reduce((partialSum, a) => partialSum + a, 0);
+  const sums = input.map((set) => sum(set)).sort((a, b) => b - a);
+  return sum(sums.slice(0, 3));
 };
 
 run({
