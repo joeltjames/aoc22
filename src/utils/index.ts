@@ -30,5 +30,4 @@
  *
  */
 
-export const sum = (arr: number[]) =>
-  arr.reduce((a: number, b: number) => a + b, 0);
+
