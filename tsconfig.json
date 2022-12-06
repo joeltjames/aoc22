@@ -8,10 +8,12 @@
     "preserveConstEnums": true,
     "strict": true,
     "allowSyntheticDefaultImports": true,
-    "moduleResolution": "node",
     "forceConsistentCasingInFileNames": true,
-    "importHelpers": true
+    "importHelpers": true,
+    "esModuleInterop": true,
+    "moduleResolution": "node",
   },
+  "type": "module",
   "include": [
     "src"
   ],
@@ -19,5 +21,7 @@
     "node_modules",
     "src/**/*.test.ts",
     "src/**/*.temp.ts"
-  ]
+  ],
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "@tsconfig/node-lts-strictest-esm/tsconfig.json",
 }

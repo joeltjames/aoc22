@@ -14,11 +14,18 @@
   "author": "J.T. James",
   "license": "ISC",
   "devDependencies": {
+    "@tsconfig/node-lts-strictest-esm": "^18.12.1",
+    "@types/lodash": "^4.14.191",
     "@types/node": "^16.11.6",
     "aocrunner": "^1.6.1",
     "prettier": "^2.4.1"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@types/chalk": "^2.2.0",
+    "chalk": "^5.1.2",
+    "lodash": "^4.17.21",
+    "ts-node": "^10.9.1"
+  },
   "engines": {
     "node": ">=16.13.0"
   }
