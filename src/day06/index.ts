@@ -7,13 +7,16 @@ const findWindow = (windowSize: number) => {
     const input = parseInput(rawInput);
 
     for (let i = windowSize; i < input.length; i++) {
+      let failingIdx = i + 1;
       if (
-        input
-          .slice(i - windowSize, i)
-          .filter((val, idx, arr) => arr.indexOf(val) === idx).length ===
-        windowSize
+        input.slice(i - windowSize, i).filter((val, idx, arr) => {
+          let firstIdx = arr.indexOf(val);
+          return firstIdx === idx || ((failingIdx = firstIdx) && false);
+        }).length === windowSize
       ) {
         return i;
+      } else {
+        i += failingIdx;
       }
     }
     return 0;
