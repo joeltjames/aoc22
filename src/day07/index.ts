@@ -43,16 +43,24 @@ const calculateSizes = (input: string[]) => {
 const part1Fast = (rawInput: string) => {
   const input = parseInput(rawInput).slice(1);
   const { sizes } = calculateSizes(input);
-  return sizes
-    .filter((size) => size < 100000)
-    .reduce((prev, curr) => prev + curr, 0);
+  return sizes.reduce((prev, curr) => {
+    if (curr < 100000) {
+      return (prev += curr);
+    }
+    return prev;
+  }, 0);
 };
 
 const part2Fast = (rawInput: string) => {
   const input = parseInput(rawInput).slice(1);
   const { rootSize, sizes } = calculateSizes(input);
-  const neededSpace = -40000000 + rootSize;
-  return sizes.filter((s) => s >= neededSpace).sort((a, b) => a - b)[0];
+  const neededSpace = rootSize - 40000000;
+  return sizes.reduce((min, val) => {
+    if (val > neededSpace && val < min) {
+      return val;
+    }
+    return min;
+  }, Number.MAX_SAFE_INTEGER);
 };
 
 run({
