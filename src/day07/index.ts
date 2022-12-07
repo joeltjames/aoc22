@@ -2,135 +2,56 @@ import run from "aocrunner";
 
 const parseInput = (rawInput: string) => rawInput.split("\n");
 
-const cdRegex = /^\$ cd/;
-const dirRegex = /^dir/;
 const fileRegex = /^(\d+)/;
 
-interface Node {
-  name: string;
-  parent: Directory;
-}
+const calculateSizes = (input: string[]) => {
+  let currentPath = ["/"];
 
-interface File extends Node {
-  name: string;
-  parent: Directory;
-  size: number;
-}
-
-interface Directory extends Node {
-  name: string;
-  parent: Directory;
-  children: { [name: string]: Directory | File };
-  size?: number;
-}
-
-const isDirectory = (x: Directory | File | undefined): x is Directory => {
-  return x && (x as any).children;
-};
-
-const calculateSize = (x: Directory): { size: number; sizes: number[] } => {
-  const sizes: number[] = [];
-
-  const recurse = (x: Directory): number => {
-    if (x.size) {
-      return x.size;
-    }
-
-    const size = Object.values(x.children)
-      .map((child) => {
-        if (isDirectory(child)) {
-          return recurse(child);
-        } else if (child) {
-          return child.size;
-        } else {
-          return 0;
-        }
-      })
-      .reduce((prev, curr) => prev + curr, 0);
-
-    x.size = size;
-
-    sizes.push(size);
-
-    return size;
-  };
-  const size = recurse(x);
-  return {
-    size,
-    sizes,
-  };
-};
-
-const populateFileStructure = (input: string[]) => {
-  let current_dir: Directory = {
-    name: "/",
-    children: {},
-    parent: null as any,
-  };
-
-  const root = current_dir;
+  const sizes: { [key: string]: number } = {};
 
   input.forEach((line) => {
     const parts = line.split(" ");
-    if (line.match(cdRegex)) {
-      const [_, __, dir] = parts;
+    if (line.includes("$ cd")) {
+      const dir = parts[2] || "";
       switch (dir) {
         case "/":
-          current_dir = root;
+          currentPath = ["/"];
           break;
         case "..":
-          current_dir = current_dir.parent;
+          currentPath.pop();
           break;
         default:
-          if (dir) {
-            const child = current_dir.children[dir];
-            if (isDirectory(child)) {
-              current_dir = child;
-            }
-          }
-      }
-    } else if (line.match(dirRegex)) {
-      const [_, name] = parts;
-      if (name) {
-        const dir: Directory = {
-          name,
-          parent: current_dir,
-          children: {},
-        };
-        current_dir.children[name] = dir;
+          currentPath.push(dir);
       }
     } else if (line.match(fileRegex)) {
-      const [size, name] = parts;
-      if (size && name) {
-        const file: File = {
-          name,
-          size: parseInt(size),
-          parent: current_dir,
-        };
-        current_dir.children[name] = file;
+      const size = parts[0];
+      const workingPath = [...currentPath];
+      while (workingPath.length > 0) {
+        const thisPath = workingPath.join("/");
+        sizes[thisPath] = (sizes[thisPath] || 0) + +(size || 0);
+        workingPath.pop();
       }
     }
   });
 
-  return root;
+  return {
+    rootSize: sizes["/"] || 0,
+    sizes: Object.values(sizes),
+  };
 };
 
-const part1 = (rawInput: string) => {
+const part1Fast = (rawInput: string) => {
   const input = parseInput(rawInput).slice(1);
-  const root = populateFileStructure(input);
-  const { sizes } = calculateSize(root);
-
+  const { sizes } = calculateSizes(input);
   return sizes
     .filter((size) => size < 100000)
     .reduce((prev, curr) => prev + curr, 0);
 };
 
-const part2 = (rawInput: string) => {
-  const input = parseInput(rawInput);
-  const root = populateFileStructure(input);
-  const { size, sizes } = calculateSize(root);
-  const unusedSpace = 70000000 - size;
-  const neededSpace = 30000000 - unusedSpace;
+const part2Fast = (rawInput: string) => {
+  const input = parseInput(rawInput).slice(1);
+  const { rootSize, sizes } = calculateSizes(input);
+  const neededSpace = -40000000 + rootSize;
   return sizes.filter((s) => s >= neededSpace).sort((a, b) => a - b)[0];
 };
 
@@ -164,7 +85,7 @@ $ ls
         expected: 95437,
       },
     ],
-    solution: part1,
+    solution: part1Fast,
   },
   part2: {
     tests: [
@@ -195,7 +116,7 @@ $ ls
         expected: 24933642,
       },
     ],
-    solution: part2,
+    solution: part2Fast,
   },
   trimTestInputs: true,
   // onlyTests: true,
