@@ -6,12 +6,12 @@
     "declaration": true,
     "outDir": "./dist",
     "preserveConstEnums": true,
-    "strict": true,
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
     "importHelpers": true,
     "esModuleInterop": true,
     "moduleResolution": "node",
+    "noUncheckedIndexedAccess": false
   },
   "type": "module",
   "include": [
