@@ -30,4 +30,32 @@
  *
  */
 
+/*
+ * Reducers
+ */
+export const sum = (arr: number[]) =>
+  arr.reduce((a: number, b: number) => a + b, 0);
 
+/*
+ * Set math
+ */
+
+export const hasAnyIntersection = (set1: Set<any>, set2: Set<any>): boolean => {
+  return Array.from(set1).some((element) => {
+    return set2.has(element);
+  });
+};
+
+export const intersection = <T>(set1: Set<T>, set2: Set<T>): Set<T> => {
+  return new Set([...set1].filter((x) => set2.has(x)));
+};
+
+export const isSubset = <T>(set1: Set<T>, set2: Set<T>): boolean => {
+  return Array.from(set1).every((element) => {
+    return set2.has(element);
+  });
+};
+
+/*
+ * END Set math
+ */
