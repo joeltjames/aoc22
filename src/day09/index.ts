@@ -62,16 +62,14 @@ const checkAndMove = (target: Point, knot: Point) => {
 const solution = (knotCount: number) => {
   return (rawInput: string) => {
     const steps = parseInput(rawInput);
-    let headPosition = { x: 0, y: 0 };
-    let knotPositions = Array(knotCount).fill({ ...headPosition });
-    const positions = new Set([`${headPosition.x},${headPosition.y}`]);
+    let knotPositions = Array(knotCount + 1).fill({ x: 0, y: 0 });
+    const positions = new Set(["0,0"]);
     steps.forEach((step) => {
       const [direction, cnt] = step.split(" ");
-      const directionFn = functionMap[direction];
+      const headMoveFn = functionMap[direction];
       const count = Number(cnt);
       for (let i = 0; i < count; i++) {
-        headPosition = directionFn(headPosition);
-        knotPositions[0] = checkAndMove(headPosition, knotPositions[0]);
+        knotPositions[0] = headMoveFn(knotPositions[0]);
         knotPositions.forEach((knot, idx) => {
           if (idx > 0) {
             knotPositions[idx] = checkAndMove(knotPositions[idx - 1], knot);
