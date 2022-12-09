@@ -19,65 +19,44 @@ const functionMap: {
   S: ({ x, y }) => ({ x, y }),
 };
 
-const parseInput = (rawInput: string) =>
-  rawInput.split("\n").map((v) => {
-    const [direction, count] = v.split(" ");
-    return {
-      directionFn: functionMap[direction],
-      count: Number(count),
-    };
-  });
+const parseInput = (rawInput: string) => rawInput.split("\n");
 
-const isKnotAdjacent = (head: Point, tail: Point) => {
-  return (
-    (head.x === tail.x && head.y === tail.y) ||
-    (head.x === tail.x && Math.abs(head.y - tail.y) === 1) ||
-    (head.y === tail.y && Math.abs(head.x - tail.x) === 1) ||
-    (Math.abs(head.x - tail.x) === 1 && Math.abs(head.y - tail.y) === 1)
+function determineMoveFn(target: Point, knot: Point): (point: Point) => Point {
+  const distance = Math.floor(
+    Math.sqrt(Math.pow(target.x - knot.x, 2) + Math.pow(target.y - knot.y, 2)),
   );
-};
 
-function determineMoveFn(head: Point, tail: Point): (point: Point) => Point {
-  const distance = Math.sqrt(
-    Math.pow(head.x - tail.x, 2) + Math.pow(head.y - tail.y, 2),
-  );
-  const x = (head.x - tail.x) / distance;
-  const y = (head.y - tail.y) / distance;
+  const x = target.x - knot.x;
+  const y = target.y - knot.y;
 
-  if (x === 1 && y === 0) {
-    return functionMap["R"];
-  }
-  if (x === -1 && y === 0) {
-    return functionMap["L"];
-  }
-  if (x === 0 && y === 1) {
-    return functionMap["U"];
-  }
-  if (x === 0 && y === -1) {
-    return functionMap["D"];
-  }
-  if (x > 0 && y > 0) {
-    return functionMap["RU"];
-  }
-  if (x < 0 && y > 0) {
-    return functionMap["LU"];
-  }
-  if (x > 0 && y < 0) {
-    return functionMap["RD"];
-  }
-  if (x < 0 && y < 0) {
-    return functionMap["LD"];
+  let direction = "S";
+
+  if (distance > 1) {
+    if (x > 1 && y === 0) {
+      direction = "R";
+    } else if (x < -1 && y === 0) {
+      direction = "L";
+    } else if (x === 0 && y > 1) {
+      direction = "U";
+    } else if (x === 0 && y < -1) {
+      direction = "D";
+    } else if (x > 0 && y > 0) {
+      direction = "RU";
+    } else if (x < 0 && y > 0) {
+      direction = "LU";
+    } else if (x > 0 && y < 0) {
+      direction = "RD";
+    } else if (x < 0 && y < 0) {
+      direction = "LD";
+    }
   }
 
-  return functionMap["S"];
+  return functionMap[direction];
 }
 
 const checkAndMove = (target: Point, knot: Point) => {
-  if (!isKnotAdjacent(target, knot)) {
-    const moveFn = determineMoveFn(target, knot);
-    return moveFn(knot);
-  }
-  return knot;
+  const moveFn = determineMoveFn(target, knot);
+  return moveFn(knot);
 };
 
 const solution = (knotCount: number) => {
@@ -87,8 +66,11 @@ const solution = (knotCount: number) => {
     let knotPositions = Array(knotCount).fill({ ...headPosition });
     const positions = new Set([`${headPosition.x},${headPosition.y}`]);
     steps.forEach((step) => {
-      for (let count = 0; count < step.count; count++) {
-        headPosition = step.directionFn(headPosition);
+      const [direction, cnt] = step.split(" ");
+      const directionFn = functionMap[direction];
+      const count = Number(cnt);
+      for (let i = 0; i < count; i++) {
+        headPosition = directionFn(headPosition);
         knotPositions[0] = checkAndMove(headPosition, knotPositions[0]);
         knotPositions.forEach((knot, idx) => {
           if (idx > 0) {
