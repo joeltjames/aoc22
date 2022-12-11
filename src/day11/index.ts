@@ -1,6 +1,4 @@
 import run from "aocrunner";
-import lodash from "lodash";
-const { isEqual } = lodash;
 
 interface Monkey {
   id: number;
