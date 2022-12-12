@@ -6,33 +6,30 @@ interface Point {
 }
 
 const parseInput = (rawInput: string) => {
-  let startPosition: Point = {
+  let start: Point = {
     x: 0,
     y: 0,
   };
-  let endPosition: Point = {
+  let end: Point = {
     x: 0,
     y: 0,
   };
   let aPositions: string[] = [];
   const grid = rawInput.split("\n").map((v, rowIdx) => {
-    const parts: string[] = v.split("");
-    if (parts.includes("S")) {
-      startPosition = {
-        x: rowIdx,
-        y: parts.indexOf("S"),
-      };
-      parts[startPosition.y] = "a";
-    }
-    if (parts.includes("E")) {
-      endPosition = {
-        x: rowIdx,
-        y: parts.indexOf("E"),
-      };
-      parts[endPosition.y] = "z";
-    }
-    return parts.map((part, colIdx) => {
-      if (part === "a") {
+    return v.split("").map((part, colIdx) => {
+      if (part === "S") {
+        start = {
+          x: rowIdx,
+          y: colIdx,
+        };
+        return 97; // 'a' char code
+      } else if (part === "E") {
+        end = {
+          x: rowIdx,
+          y: colIdx,
+        };
+        return 122; // 'z' char code
+      } else if (part === "a") {
         aPositions.push(`${rowIdx},${colIdx}`);
       }
       return part.charCodeAt(0);
@@ -40,80 +37,83 @@ const parseInput = (rawInput: string) => {
   });
 
   return {
-    start: startPosition,
-    end: endPosition,
+    start,
+    end,
     grid,
     aPositions,
   };
 };
 
-class Graph {
-  neighbors: { [key: string]: string[] } = {}; // Key = vertex, value = array of neighbors.
+type Vertex = string;
 
-  addEdge(v1: string, v2: string) {
-    if (this.neighbors[v1] === undefined) {
-      this.neighbors[v1] = [];
+class Graph {
+  edges: { [vertex: Vertex]: Vertex[] } = {};
+
+  addEdge(vertex1: Vertex, vertex2: Vertex) {
+    if (!(vertex1 in this.edges)) {
+      this.edges[vertex1] = [];
     }
-    this.neighbors[v1].push(v2);
+    this.edges[vertex1].push(vertex2);
   }
 }
 
-function shortestPath(graph: Graph, source: string, target: string) {
-  if (source == target) {
+const shortestPath = (graph: Graph, start: Vertex, end: Vertex) => {
+  if (start == end) {
     return [];
   }
 
-  let toProcess = [source],
-    visited = { [source]: true },
-    predecessor: { [key: string]: string } = {},
-    count = 0;
+  const queue = [start];
+  const visited: { [vertex: Vertex]: boolean } = { start: true };
+  const walkedEdges: { [key: Vertex]: Vertex } = {};
 
-  while (count < toProcess.length) {
-    let thisVertex = toProcess[count++];
-    const neighbors = graph.neighbors[thisVertex];
+  while (queue.length > 0) {
+    let thisVertex = queue.shift();
 
-    for (let neighbor of neighbors) {
-      if (visited[neighbor]) {
-        continue;
-      }
-
-      visited[neighbor] = true;
-
-      if (neighbor === target) {
-        const path = [];
-        while (thisVertex !== source) {
-          path.push(thisVertex);
-          thisVertex = predecessor[thisVertex];
+    if (thisVertex) {
+      for (const edge of graph.edges[thisVertex]) {
+        if (visited[edge]) {
+          continue;
         }
-        path.push(thisVertex);
-        path.reverse();
-        return path;
+
+        visited[edge] = true;
+
+        if (edge === end) {
+          const path = [];
+          while (thisVertex !== start) {
+            path.push(thisVertex);
+            thisVertex = walkedEdges[thisVertex];
+          }
+          path.push(thisVertex);
+          path.reverse();
+          return path;
+        }
+
+        walkedEdges[edge] = thisVertex;
+
+        queue.push(edge);
       }
-
-      predecessor[neighbor] = thisVertex;
-
-      toProcess.push(neighbor);
     }
   }
 
   return [];
-}
+};
 
 const buildGraph = (grid: number[][]) => {
   const graph = new Graph();
   grid.forEach((row, rowIdx) => {
     row.forEach((cell, colIdx) => {
+      const thisVertex = `${rowIdx},${colIdx}`;
       if (rowIdx > 0 && grid[rowIdx - 1][colIdx] - cell <= 1) {
-        graph.addEdge(`${rowIdx},${colIdx}`, `${rowIdx - 1},${colIdx}`);
+        graph.addEdge(thisVertex, `${rowIdx - 1},${colIdx}`);
       }
       if (rowIdx < grid.length - 1 && grid[rowIdx + 1][colIdx] - cell <= 1) {
-        graph.addEdge(`${rowIdx},${colIdx}`, `${rowIdx + 1},${colIdx}`);
+        graph.addEdge(thisVertex, `${rowIdx + 1},${colIdx}`);
       }
       if (colIdx < row.length - 1 && grid[rowIdx][colIdx + 1] - cell <= 1) {
-        graph.addEdge(`${rowIdx},${colIdx}`, `${rowIdx},${colIdx + 1}`);
+        graph.addEdge(thisVertex, `${rowIdx},${colIdx + 1}`);
       }
       if (colIdx > 0 && grid[rowIdx][colIdx - 1] - cell <= 1) {
-        graph.addEdge(`${rowIdx},${colIdx}`, `${rowIdx},${colIdx - 1}`);
+        graph.addEdge(thisVertex, `${rowIdx},${colIdx - 1}`);
       }
     });
   });
