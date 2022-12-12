@@ -98,6 +98,47 @@ const shortestPath = (graph: Graph, start: Vertex, end: Vertex) => {
   return [];
 };
 
+const shortestPathToAny = (graph: Graph, start: Vertex, ends: Vertex[]) => {
+  if (ends.includes(start)) {
+    return [];
+  }
+
+  const queue = [start];
+  const visited: { [vertex: Vertex]: boolean } = { start: true };
+  const walkedEdges: { [key: Vertex]: Vertex } = {};
+
+  while (queue.length > 0) {
+    let thisVertex = queue.shift();
+
+    if (thisVertex) {
+      for (const edge of graph.edges[thisVertex]) {
+        if (visited[edge]) {
+          continue;
+        }
+
+        visited[edge] = true;
+
+        if (ends.includes(edge)) {
+          const path = [];
+          while (thisVertex !== start) {
+            path.push(thisVertex);
+            thisVertex = walkedEdges[thisVertex];
+          }
+          path.push(thisVertex);
+          path.reverse();
+          return path;
+        }
+
+        walkedEdges[edge] = thisVertex;
+
+        queue.push(edge);
+      }
+    }
+  }
+
+  return [];
+};
+
 const buildGraph = (grid: number[][]) => {
   const graph = new Graph();
   grid.forEach((row, rowIdx) => {
@@ -113,6 +154,28 @@ const buildGraph = (grid: number[][]) => {
         graph.addEdge(thisVertex, `${rowIdx},${colIdx + 1}`);
       }
       if (colIdx > 0 && grid[rowIdx][colIdx - 1] - cell <= 1) {
+        graph.addEdge(thisVertex, `${rowIdx},${colIdx - 1}`);
+      }
+    });
+  });
+  return graph;
+};
+
+const buildReverseGraph = (grid: number[][]) => {
+  const graph = new Graph();
+  grid.forEach((row, rowIdx) => {
+    row.forEach((cell, colIdx) => {
+      const thisVertex = `${rowIdx},${colIdx}`;
+      if (rowIdx > 0 && cell - grid[rowIdx - 1][colIdx] <= 1) {
+        graph.addEdge(thisVertex, `${rowIdx - 1},${colIdx}`);
+      }
+      if (rowIdx < grid.length - 1 && cell - grid[rowIdx + 1][colIdx] <= 1) {
+        graph.addEdge(thisVertex, `${rowIdx + 1},${colIdx}`);
+      }
+      if (colIdx < row.length - 1 && cell - grid[rowIdx][colIdx + 1] <= 1) {
+        graph.addEdge(thisVertex, `${rowIdx},${colIdx + 1}`);
+      }
+      if (colIdx > 0 && cell - grid[rowIdx][colIdx - 1] <= 1) {
         graph.addEdge(thisVertex, `${rowIdx},${colIdx - 1}`);
       }
     });
@@ -144,6 +207,17 @@ const part2 = (rawInput: string) => {
   return min;
 };
 
+const part2optimized = (rawInput: string) => {
+  const input = parseInput(rawInput);
+  const graph = buildReverseGraph(input.grid);
+  const path = shortestPathToAny(
+    graph,
+    `${input.end.x},${input.end.y}`,
+    input.aPositions,
+  );
+  return path.length;
+};
+
 run({
   part1: {
     tests: [
@@ -165,7 +239,7 @@ abdefghi`,
       //   expected: "",
       // },
     ],
-    solution: part2,
+    solution: part2optimized,
   },
   trimTestInputs: true,
   // onlyTests: true,
