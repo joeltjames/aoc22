@@ -72,7 +72,7 @@ const part1 = (rawInput: string) => {
   const input = parseInput(rawInput);
   let sum = 0;
   input.forEach((pairs, idx) => {
-    if (areInOrderNoRecurse(pairs[0], pairs[1]) === Result.IN_ORDER) {
+    if (areInOrder(pairs[0], pairs[1]) === Result.IN_ORDER) {
       sum += idx + 1;
     }
   });
